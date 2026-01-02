@@ -24,7 +24,7 @@ A TUI (Terminal User Interface) email client that renders HTML emails with full 
 
 ```bash
 # Clone the repository
-git clone https://github.com/YOUR_USERNAME/hawk-tui.git
+git clone https://github.com/RipKord42/hawk-tui.git
 cd hawk-tui
 
 # Install in development mode
