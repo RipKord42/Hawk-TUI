@@ -12,7 +12,7 @@ I openly welcome any feedback, input, or assistance to improve this project.
 
 ## Current Features
 
-- **HTML Email Rendering**: View HTML emails with proper formatting and inline images using terminal graphics (Sixel/Kitty protocol)
+- **HTML Email Rendering**: View HTML emails with (close to - YMMV) proper formatting
 - **Multi-Account Support**: Manage multiple email accounts in a unified interface
 - **IMAP with IDLE Push**: Real-time notifications when new mail arrives — no polling needed
 - **Full Offline Sync**: All emails are synced to a local SQLite database for offline access
