@@ -1,0 +1,157 @@
+# =============================================================================
+# Hawk-TUI: A TUI Email Client with HTML Rendering
+# =============================================================================
+# This is the project configuration file using modern Python packaging (PEP 621)
+# Build with: pip install -e . (for development) or pip install . (for install)
+# =============================================================================
+
+[project]
+name = "hawk-tui"
+version = "0.1.0"
+description = "A TUI email client that renders HTML emails like a GUI client"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.11"
+authors = [
+    {name = "Kord"}
+]
+keywords = ["email", "tui", "terminal", "imap", "html"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Communications :: Email :: Email Clients (MUA)",
+]
+
+# -----------------------------------------------------------------------------
+# Core Dependencies
+# -----------------------------------------------------------------------------
+dependencies = [
+    # TUI Framework - Textual is the most capable terminal UI framework
+    # available for Python. Supports CSS-like styling and async-native design.
+    "textual>=0.47.0",
+
+    # Async SQLite - We use SQLite for offline storage and need async support
+    # to keep the UI responsive during database operations.
+    "aiosqlite>=0.19.0",
+
+    # Async IMAP - For fetching emails without blocking the UI.
+    # aioimaplib provides a clean async interface to IMAP4.
+    "aioimaplib>=1.0.0",
+
+    # Async SMTP - For sending emails (reply, forward, compose).
+    "aiosmtplib>=3.0.0",
+
+    # HTML Parsing - BeautifulSoup is the gold standard for parsing HTML.
+    # We use it to extract content and images from email HTML.
+    "beautifulsoup4>=4.12.0",
+    "lxml>=5.0.0",  # Fast parser backend for BeautifulSoup
+
+    # HTML to Text - inscriptis does the best job of converting HTML to
+    # readable plain text while preserving structure.
+    "inscriptis>=2.3.0",
+
+    # Image Processing - For converting images to terminal-compatible formats
+    # (Sixel, Kitty graphics protocol).
+    "Pillow>=10.0.0",
+
+    # MIME Type Detection - Needed for properly handling attachments.
+    "python-magic>=0.4.27",
+
+    # Secure Credential Storage - We never store passwords in config files.
+    # keyring integrates with the system's secure credential storage.
+    "keyring>=24.0.0",
+
+    # TOML Config Parsing - For reading configuration files.
+    # tomli is only needed for Python < 3.11, but we include tomli-w for writing.
+    "tomli-w>=1.0.0",
+]
+
+# -----------------------------------------------------------------------------
+# Optional Dependencies
+# -----------------------------------------------------------------------------
+[project.optional-dependencies]
+# For full HTML rendering via headless browser (Chromium)
+# Install with: pip install hawk-tui[browser]
+browser = [
+    "playwright>=1.40.0",
+]
+
+# Development dependencies
+# Install with: pip install hawk-tui[dev]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-cov>=4.1.0",
+    "ruff>=0.1.0",
+    "mypy>=1.7.0",
+]
+
+# All optional dependencies
+# Install with: pip install hawk-tui[all]
+all = [
+    "hawk-tui[browser]",
+    "hawk-tui[dev]",
+]
+
+# -----------------------------------------------------------------------------
+# Entry Points
+# -----------------------------------------------------------------------------
+[project.scripts]
+# This creates the 'hawk-tui' command that users can run from terminal
+hawk-tui = "hawk_tui:main"
+
+[project.urls]
+Homepage = "https://github.com/kord/hawk-tui"
+Repository = "https://github.com/kord/hawk-tui"
+
+# -----------------------------------------------------------------------------
+# Build System
+# -----------------------------------------------------------------------------
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/hawk_tui"]
+
+# -----------------------------------------------------------------------------
+# Development Tools Configuration
+# -----------------------------------------------------------------------------
+
+# Ruff - Fast Python linter
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["src"]
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # Pyflakes
+    "I",    # isort
+    "B",    # flake8-bugbear
+    "C4",   # flake8-comprehensions
+    "UP",   # pyupgrade
+]
+ignore = [
+    "E501",  # line too long (we handle this with formatter)
+]
+
+# Pytest configuration
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+addopts = "-v --tb=short"
+
+# MyPy - Static type checking
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_ignores = true
+strict = true

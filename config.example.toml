@@ -1,0 +1,170 @@
+# =============================================================================
+# Hawk-TUI Configuration Example
+# =============================================================================
+# Copy this file to ~/.config/hawk-tui/config.toml and edit with your settings.
+#
+# IMPORTANT: Never store passwords in this file! Hawk-TUI uses the system
+# keyring for secure credential storage. Set passwords with:
+#   keyring set hawk-tui:personal your@email.com
+#
+# XDG Paths (defaults):
+#   Config:  ~/.config/hawk-tui/config.toml
+#   Data:    ~/.local/share/hawk-tui/hawk-tui.db
+#   Cache:   ~/.cache/hawk-tui/
+#   State:   ~/.local/state/hawk-tui/
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# General Settings
+# -----------------------------------------------------------------------------
+[general]
+# Which account to select on startup (must match an account name below)
+default_account = "personal"
+
+# -----------------------------------------------------------------------------
+# Rendering Settings
+# -----------------------------------------------------------------------------
+[rendering]
+# Rendering mode for HTML emails:
+#   "fast"    - Use inscriptis (text-based, quick)
+#   "browser" - Use headless browser (pixel-perfect, slow)
+#   "auto"    - Try fast first, fall back to browser for complex emails
+mode = "auto"
+
+# Terminal graphics protocol for inline images:
+#   "sixel" - Sixel graphics (widely supported)
+#   "kitty" - Kitty graphics protocol (better quality)
+#   "auto"  - Auto-detect terminal capabilities
+#   "none"  - Disable image display
+image_protocol = "auto"
+
+# Maximum image dimensions (in terminal cells)
+max_image_width = 80
+max_image_height = 40
+
+# -----------------------------------------------------------------------------
+# Spam Filter Settings
+# -----------------------------------------------------------------------------
+[spam]
+# Enable client-side spam filtering
+enabled = true
+
+# Spam score threshold (0.0 to 1.0)
+# Messages with score >= threshold are classified as spam
+threshold = 0.7
+
+# Automatically move spam to Junk folder on server
+auto_move_to_junk = true
+
+# Train classifier when you manually move messages to/from Junk
+train_on_move = true
+
+# -----------------------------------------------------------------------------
+# Synchronization Settings
+# -----------------------------------------------------------------------------
+[sync]
+# How often to check for new mail (minutes, 0 = manual only)
+check_interval_minutes = 5
+
+# Use IMAP IDLE for push notifications (if server supports it)
+use_idle = true
+
+# Sync messages marked as deleted
+sync_deleted = false
+
+# Only sync messages newer than this (days, 0 = all messages)
+# Useful for large mailboxes where you don't need ancient emails
+max_age_days = 0
+
+# -----------------------------------------------------------------------------
+# User Interface Settings
+# -----------------------------------------------------------------------------
+[ui]
+# Color theme ("dark" or "light")
+theme = "dark"
+
+# Date format for message list (strftime format)
+date_format = "%Y-%m-%d"
+
+# Time format
+time_format = "%H:%M"
+
+# Require confirmation before deleting messages
+confirm_delete = true
+
+# Number of preview lines in message list
+preview_lines = 2
+
+# -----------------------------------------------------------------------------
+# Email Accounts
+# -----------------------------------------------------------------------------
+# Add your email accounts here. Each account needs a unique name.
+# The password should be stored in the system keyring, not here.
+#
+# To set password:
+#   keyring set hawk-tui:personal your@email.com
+#
+# To verify password is stored:
+#   keyring get hawk-tui:personal your@email.com
+
+[accounts.personal]
+email = "you@example.com"
+display_name = "Your Name"
+
+# IMAP settings (for receiving mail)
+imap_host = "imap.example.com"
+imap_port = 993
+imap_security = "ssl"   # "ssl" or "starttls"
+
+# SMTP settings (for sending mail)
+smtp_host = "smtp.example.com"
+smtp_port = 587
+smtp_security = "starttls"  # "ssl" or "starttls"
+
+# Enable/disable this account
+enabled = true
+
+# -----------------------------------------------------------------------------
+# Additional Account Examples
+# -----------------------------------------------------------------------------
+
+# Gmail example
+# Note: You'll need to generate an App Password for Gmail
+# https://myaccount.google.com/apppasswords
+#
+# [accounts.gmail]
+# email = "yourname@gmail.com"
+# display_name = "Your Name"
+# imap_host = "imap.gmail.com"
+# imap_port = 993
+# imap_security = "ssl"
+# smtp_host = "smtp.gmail.com"
+# smtp_port = 587
+# smtp_security = "starttls"
+# enabled = true
+
+# Fastmail example
+#
+# [accounts.fastmail]
+# email = "yourname@fastmail.com"
+# display_name = "Your Name"
+# imap_host = "imap.fastmail.com"
+# imap_port = 993
+# imap_security = "ssl"
+# smtp_host = "smtp.fastmail.com"
+# smtp_port = 587
+# smtp_security = "starttls"
+# enabled = true
+
+# Work/Corporate example (often uses different ports)
+#
+# [accounts.work]
+# email = "you@company.com"
+# display_name = "Your Name"
+# imap_host = "mail.company.com"
+# imap_port = 993
+# imap_security = "ssl"
+# smtp_host = "mail.company.com"
+# smtp_port = 587
+# smtp_security = "starttls"
+# enabled = true
