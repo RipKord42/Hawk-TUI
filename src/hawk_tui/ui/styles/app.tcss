@@ -12,12 +12,27 @@
  * ============================================================================= */
 
 /* -----------------------------------------------------------------------------
+ * Custom Color Scheme - Crimson Hawk
+ * ----------------------------------------------------------------------------- */
+$primary: #78230a;
+$primary-lighten-1: #8f2c0d;
+$primary-lighten-2: #a63510;
+$primary-darken-1: #611c08;
+$primary-darken-2: #4a1506;
+$secondary: #d4a574;
+$accent: #c45c26;
+
+/* -----------------------------------------------------------------------------
  * Global Styles
  * ----------------------------------------------------------------------------- */
 
 /* App-wide defaults */
 Screen {
     background: $surface;
+    scrollbar-color: $primary;
+    scrollbar-color-hover: $primary-lighten-1;
+    scrollbar-color-active: $primary-lighten-2;
+    scrollbar-background: $surface-darken-1;
 }
 
 /* Standard header styling */
@@ -132,6 +147,10 @@ Footer {
 
 FolderTree {
     padding: 0 1;
+    scrollbar-color: $primary;
+    scrollbar-color-hover: $primary-lighten-1;
+    scrollbar-color-active: $primary-lighten-2;
+    scrollbar-background: $surface-darken-1;
 }
 
 FolderTree > .tree--cursor {
@@ -140,6 +159,18 @@ FolderTree > .tree--cursor {
 
 FolderTree > .tree--highlight {
     background: $primary-lighten-2;
+}
+
+FolderTree > .tree--guides {
+    color: $primary;
+}
+
+FolderTree > .tree--guides-hover {
+    color: $primary-lighten-1;
+}
+
+FolderTree > .tree--guides-selected {
+    color: $primary-lighten-2;
 }
 
 /* -----------------------------------------------------------------------------
@@ -179,17 +210,3 @@ MessagePreview {
     padding: 2;
 }
 
-/* -----------------------------------------------------------------------------
- * Color Scheme Variables (Dark Theme)
- * ----------------------------------------------------------------------------- */
-/* These use Textual's built-in color variables which adapt to the theme.
- * You can override them here for custom colors:
- *
- * $primary: #3498db;
- * $secondary: #2ecc71;
- * $surface: #1a1a2e;
- * $background: #16213e;
- * $error: #e74c3c;
- * $warning: #f39c12;
- * $success: #27ae60;
- */

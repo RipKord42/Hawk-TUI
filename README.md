@@ -148,3 +148,4 @@ Built with:
 - [inscriptis](https://github.com/weblyzard/inscriptis) - HTML→text conversion
 - [BeautifulSoup](https://www.crummy.com/software/BeautifulSoup/) - HTML parsing
 - [Pillow](https://pillow.readthedocs.io/) - Image processing
+ 
