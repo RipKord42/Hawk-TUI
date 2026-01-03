@@ -24,7 +24,9 @@ I openly welcome any feedback, input, or assistance to improve this project.
 
 - Python 3.11+
 - A terminal with good Unicode support
-- For image rendering: a terminal that supports Sixel or Kitty graphics protocol (foot, kitty, wezterm, etc.)
+- For image rendering (coming soon): a terminal that supports Sixel or Kitty graphics protocol (foot, kitty, wezterm, etc.)
+- SQLite
+
 
 ## Installation
 
