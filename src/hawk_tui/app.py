@@ -46,7 +46,7 @@ class HawkTUIApp(App):
 
     # Application metadata
     TITLE = "Hawk-TUI"
-    SUB_TITLE = "The hawk sees all"
+    SUB_TITLE = "Mailhawk Email"
 
     # Path to CSS file (relative to this module)
     CSS_PATH = Path(__file__).parent / "ui" / "styles" / "app.tcss"
