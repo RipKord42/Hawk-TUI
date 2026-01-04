@@ -292,8 +292,14 @@ class MainScreen(Screen):
         if self._db:
             await self._db.close()
 
-    async def _load_folders(self) -> None:
-        """Load folders from database into the tree."""
+    async def _load_folders(self, auto_select_inbox: bool = True) -> None:
+        """Load folders from database into the tree.
+
+        Args:
+            auto_select_inbox: If True, auto-select INBOX after loading.
+                              Set to False when refreshing after operations
+                              that should stay on the current folder.
+        """
         if not self._repo:
             return
 
@@ -321,8 +327,8 @@ class MainScreen(Screen):
         tree = self.query_one("#folder-tree", FolderTree)
         await tree.load_accounts(accounts, folders_by_account)
 
-        # Auto-select INBOX if available
-        if self._current_account and self._current_account.id:
+        # Auto-select INBOX if available (only on initial load)
+        if auto_select_inbox and self._current_account and self._current_account.id:
             inbox = await self._repo.get_folder_by_name(
                 self._current_account.id, "INBOX"
             )
@@ -494,12 +500,15 @@ class MainScreen(Screen):
 
     async def _reload_folders_and_messages(self) -> None:
         """Reload folders and current message list after sync."""
-        # Reload folder tree
-        await self._load_folders()
+        # Save current folder before reloading (since _load_folders can change it)
+        current_folder = self._current_folder
 
-        # Reload current folder's messages
-        if self._current_folder:
-            await self._select_folder(self._current_folder)
+        # Reload folder tree without auto-selecting INBOX
+        await self._load_folders(auto_select_inbox=False)
+
+        # Re-select the folder we were viewing (reloads messages too)
+        if current_folder:
+            await self._select_folder(current_folder)
 
     # -------------------------------------------------------------------------
     # IDLE / Push Notifications
@@ -591,8 +600,8 @@ class MainScreen(Screen):
             if self._current_account and self._current_account.id == account_id:
                 await self._reload_folders_and_messages()
             else:
-                # At least refresh folder tree for unread counts
-                await self._load_folders()
+                # At least refresh folder tree for unread counts (stay on current folder)
+                await self._load_folders(auto_select_inbox=False)
 
         except Exception as e:
             # Log error but don't show to user - IDLE will retry
@@ -832,8 +841,8 @@ class MainScreen(Screen):
                     self._current_folder.unread_count = max(0, self._current_folder.unread_count - unread_deleted)
                     await self._repo.save_folder(self._current_folder)
 
-                    # Refresh folder tree to show updated counts
-                    await self._load_folders()
+                    # Refresh folder tree to show updated counts (stay on current folder)
+                    await self._load_folders(auto_select_inbox=False)
 
             except Exception as e:
                 await client.disconnect()
@@ -913,6 +922,20 @@ class MainScreen(Screen):
                                     await preview.show_message(full_next)
                             else:
                                 await preview.clear()
+
+                            # Update folder counts for both source and Junk
+                            if self._repo:
+                                unread_moved = sum(1 for m in valid_messages if not m.is_read)
+                                # Decrease source folder counts
+                                self._current_folder.total_messages = max(0, self._current_folder.total_messages - moved_count)
+                                self._current_folder.unread_count = max(0, self._current_folder.unread_count - unread_moved)
+                                await self._repo.save_folder(self._current_folder)
+                                # Increase Junk counts
+                                junk_folder.total_messages += moved_count
+                                junk_folder.unread_count += unread_moved
+                                await self._repo.save_folder(junk_folder)
+                                # Refresh folder tree (stay on current folder)
+                                await self._load_folders(auto_select_inbox=False)
 
                             if moved_count == 1:
                                 self.notify("Moved to Junk")
@@ -1004,6 +1027,20 @@ class MainScreen(Screen):
                                     await preview.show_message(full_next)
                             else:
                                 await preview.clear()
+
+                            # Update folder counts for both Junk and Inbox
+                            if self._repo:
+                                unread_moved = sum(1 for m in valid_messages if not m.is_read)
+                                # Decrease Junk counts
+                                self._current_folder.total_messages = max(0, self._current_folder.total_messages - moved_count)
+                                self._current_folder.unread_count = max(0, self._current_folder.unread_count - unread_moved)
+                                await self._repo.save_folder(self._current_folder)
+                                # Increase Inbox counts
+                                inbox_folder.total_messages += moved_count
+                                inbox_folder.unread_count += unread_moved
+                                await self._repo.save_folder(inbox_folder)
+                                # Refresh folder tree (stay on current folder)
+                                await self._load_folders(auto_select_inbox=False)
 
                             if moved_count == 1:
                                 self.notify("Moved to Inbox")
@@ -1147,9 +1184,8 @@ class MainScreen(Screen):
                 if self._repo:
                     await self._repo.save_folder(self._current_folder)
 
-            # Refresh folder tree to show updated count
-            folder_tree = self.query_one("#folder-tree", FolderTree)
-            folder_tree.refresh()
+            # Refresh folder tree to show updated count (stay on current folder)
+            await self._load_folders(auto_select_inbox=False)
 
             self.update_status(f"{display_name} emptied")
             self.notify(f"{display_name} emptied ({msg_count} messages deleted)")
