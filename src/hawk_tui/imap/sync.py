@@ -854,17 +854,29 @@ class SyncManager:
         if not local_uids:
             return 0
 
-        # Get server UIDs - we need to fetch just the UIDs
-        # For efficiency, we could use IMAP SEARCH UID ALL
-        # For now, we'll fetch minimal data
-        server_messages = await self.client.fetch_messages(
-            folder.name,
-            uids=list(local_uids),
-        )
-        server_uids = {msg.uid for msg in server_messages}
+        # Get server UIDs directly (more reliable than fetching full messages)
+        server_uids = await self.client.get_folder_uids(folder.name)
+
+        # Safeguard: If server returns no UIDs but we have local messages,
+        # something is wrong - don't delete anything
+        if not server_uids and local_uids:
+            logger.warning(
+                f"Server returned 0 UIDs for {folder.name} but we have "
+                f"{len(local_uids)} local messages - skipping deletion sync"
+            )
+            return 0
 
         # Find UIDs that exist locally but not on server
         deleted_uids = local_uids - server_uids
+
+        # Safeguard: Don't delete more than 50% of messages in one sync
+        # This prevents catastrophic data loss from sync bugs
+        if len(deleted_uids) > len(local_uids) * 0.5:
+            logger.warning(
+                f"Deletion sync would remove {len(deleted_uids)}/{len(local_uids)} "
+                f"messages from {folder.name} - skipping as safety measure"
+            )
+            return 0
 
         if deleted_uids:
             deleted_count = await self.repo.delete_messages_by_uids(
