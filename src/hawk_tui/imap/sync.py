@@ -759,8 +759,17 @@ class SyncManager:
                 )
                 result.spam_moved += spam_count
 
+                # Debug: Log if there's a mismatch between fetched and saved
+                if len(ham_messages) + spam_count != len(messages):
+                    logger.warning(
+                        f"Message count mismatch in {folder.name}: "
+                        f"fetched={len(messages)}, ham={len(ham_messages)}, spam={spam_count}"
+                    )
+
                 # Save messages to database
-                await self.repo.save_messages_bulk(ham_messages)
+                if ham_messages:
+                    await self.repo.save_messages_bulk(ham_messages)
+                    logger.debug(f"Saved {len(ham_messages)} messages to {folder.name}")
 
                 fetched_count += len(messages)
                 result.new_messages += len(messages)
